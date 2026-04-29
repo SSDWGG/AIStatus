@@ -4,6 +4,7 @@ set -euo pipefail
 APP_NAME="AiStatus"
 CONFIGURATION="${1:-release}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 
 cd "$ROOT_DIR"
 
@@ -19,8 +20,12 @@ cp "$ROOT_DIR/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 cp "$ROOT_DIR/Resources/AppIcon.icns" "$APP_DIR/Contents/Resources/AppIcon.icns"
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
 
-if command -v codesign >/dev/null 2>&1; then
-    codesign --force --sign - "$APP_DIR" >/dev/null
+if [[ "${SKIP_CODESIGN:-0}" != "1" ]] && command -v codesign >/dev/null 2>&1; then
+    if [[ "$SIGN_IDENTITY" == "-" ]]; then
+        codesign --force --sign - "$APP_DIR" >/dev/null
+    else
+        codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP_DIR" >/dev/null
+    fi
 fi
 
 echo "$APP_DIR"

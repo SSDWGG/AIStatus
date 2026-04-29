@@ -451,47 +451,78 @@ private final class SleepPreventionPreferences {
 }
 
 private final class SleepPreventer {
-    private var assertionID = IOPMAssertionID(kIOPMNullAssertionID)
+    private var systemSleepAssertionID = IOPMAssertionID(kIOPMNullAssertionID)
+    private var displaySleepAssertionID = IOPMAssertionID(kIOPMNullAssertionID)
 
     private(set) var isEnabled = false
 
     func enable() -> String? {
-        guard assertionID == kIOPMNullAssertionID else {
+        guard !hasActiveAssertions else {
             isEnabled = true
             return nil
         }
 
-        var newAssertionID = IOPMAssertionID(kIOPMNullAssertionID)
-        let result = IOPMAssertionCreateWithName(
-            kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
-            IOPMAssertionLevel(kIOPMAssertionLevelOn),
-            "AiStatus 保持 Mac 活跃" as CFString,
-            &newAssertionID
-        )
+        disable()
 
-        guard result == kIOReturnSuccess else {
+        let systemSleepResult = createAssertion(
+            type: kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
+            name: "AiStatus Prevent Idle System Sleep",
+            assertionID: &systemSleepAssertionID
+        )
+        guard systemSleepResult == kIOReturnSuccess else {
             isEnabled = false
-            return "无法开启防休眠（IOKit \(result)）"
+            return "无法开启防休眠（系统空闲睡眠 IOKit \(systemSleepResult)）"
         }
 
-        assertionID = newAssertionID
+        let displaySleepResult = createAssertion(
+            type: kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
+            name: "AiStatus Prevent Idle Display Sleep",
+            assertionID: &displaySleepAssertionID
+        )
+        guard displaySleepResult == kIOReturnSuccess else {
+            disable()
+            return "无法开启防休眠（显示器空闲睡眠 IOKit \(displaySleepResult)）"
+        }
+
         isEnabled = true
         return nil
     }
 
     func disable() {
-        guard assertionID != kIOPMNullAssertionID else {
-            isEnabled = false
-            return
-        }
-
-        IOPMAssertionRelease(assertionID)
-        assertionID = IOPMAssertionID(kIOPMNullAssertionID)
+        releaseAssertion(&displaySleepAssertionID)
+        releaseAssertion(&systemSleepAssertionID)
         isEnabled = false
     }
 
     deinit {
         disable()
+    }
+
+    private var hasActiveAssertions: Bool {
+        systemSleepAssertionID != kIOPMNullAssertionID &&
+            displaySleepAssertionID != kIOPMNullAssertionID
+    }
+
+    private func createAssertion(
+        type: CFString,
+        name: String,
+        assertionID: inout IOPMAssertionID
+    ) -> IOReturn {
+        IOPMAssertionCreateWithName(
+            type,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            name as CFString,
+            &assertionID
+        )
+    }
+
+    private func releaseAssertion(_ assertionID: inout IOPMAssertionID) {
+        guard assertionID != kIOPMNullAssertionID else {
+            return
+        }
+
+        IOPMAssertionRelease(assertionID)
+        assertionID = IOPMAssertionID(kIOPMNullAssertionID)
     }
 }
 

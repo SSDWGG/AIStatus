@@ -4,3 +4,4 @@ dist/
 *.xcodeproj/
 DerivedData/
 Resources/AppIcon.iconset/
+.env.deploy.local
