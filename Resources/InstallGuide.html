@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AiStatus 安装说明</title>
+    <style>
+        :root {
+            --bg: #faf9f5;
+            --surface: #fffdf8;
+            --surface-strong: #f2eee6;
+            --ink: #191715;
+            --muted: #635f58;
+            --line: #ddd6ca;
+            --accent: #c15f3c;
+            --accent-dark: #8f3e27;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                linear-gradient(90deg, rgba(25, 23, 21, 0.035) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(25, 23, 21, 0.03) 1px, transparent 1px),
+                var(--bg);
+            background-size: 48px 48px;
+            color: var(--ink);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+            line-height: 1.65;
+        }
+
+        main {
+            width: min(calc(100% - 32px), 980px);
+            margin: 0 auto;
+            padding: 56px 0;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            max-width: 760px;
+            margin-bottom: 18px;
+            font-size: clamp(2.4rem, 6vw, 4.8rem);
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            line-height: 1.1;
+        }
+
+        .lede {
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+
+        .notice,
+        .steps,
+        .visual {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+        }
+
+        .notice {
+            margin: 28px 0;
+            padding: 18px 20px;
+        }
+
+        .notice strong {
+            color: var(--accent-dark);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .steps {
+            display: grid;
+            gap: 14px;
+            margin: 0;
+            padding: 22px;
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .steps li {
+            position: relative;
+            min-height: 42px;
+            padding-left: 52px;
+            color: var(--muted);
+        }
+
+        .steps li::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border: 1px solid #c9beb0;
+            border-radius: 50%;
+            color: var(--accent-dark);
+            content: counter(step);
+            counter-increment: step;
+            font-weight: 800;
+        }
+
+        .steps strong {
+            display: block;
+            color: var(--ink);
+        }
+
+        .visual {
+            position: relative;
+            min-height: 360px;
+            overflow: hidden;
+            padding: 18px;
+        }
+
+        .settings-window {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            min-height: 260px;
+            overflow: hidden;
+            border: 1px solid #c9beb0;
+            border-radius: var(--radius);
+            background: var(--bg);
+            box-shadow: 0 18px 42px rgba(38, 29, 20, 0.12);
+        }
+
+        .sidebar {
+            display: grid;
+            gap: 9px;
+            align-content: start;
+            padding: 16px 12px;
+            border-right: 1px solid var(--line);
+            background: var(--surface-strong);
+        }
+
+        .sidebar span,
+        .sidebar strong {
+            min-height: 24px;
+            border-radius: 6px;
+        }
+
+        .sidebar span {
+            background: rgba(201, 190, 176, 0.35);
+        }
+
+        .sidebar strong {
+            padding: 4px 8px;
+            background: var(--surface);
+            font-size: 0.82rem;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .panel-title {
+            margin-bottom: 46px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .gatekeeper {
+            padding: 14px;
+            border: 1px solid #f1d7ca;
+            border-radius: var(--radius);
+            background: var(--surface);
+        }
+
+        .gatekeeper p {
+            color: var(--muted);
+        }
+
+        .gatekeeper button {
+            min-height: 38px;
+            padding: 0 14px;
+            border: 1px solid var(--ink);
+            border-radius: var(--radius);
+            background: var(--ink);
+            color: var(--surface);
+            font: inherit;
+            font-weight: 800;
+        }
+
+        .dialog {
+            position: absolute;
+            right: 28px;
+            bottom: 28px;
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 10px;
+            width: min(84%, 360px);
+            padding: 14px;
+            border: 1px solid #c9beb0;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 18px 42px rgba(38, 29, 20, 0.12);
+        }
+
+        .icon {
+            display: grid;
+            width: 32px;
+            height: 32px;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--surface);
+            font-weight: 800;
+        }
+
+        .dialog p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .english {
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid var(--line);
+        }
+
+        @media (max-width: 760px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-window {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                grid-template-columns: 1fr 1fr;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>AiStatus 安装说明</h1>
+        <p class="lede">如果首次打开时看到“Apple 无法验证是否包含可能危害 Mac 的恶意软件”，这是因为当前版本没有使用 Apple 认证的 Developer ID 证书签名。确认安装包来自 AiStatus 官方下载页后，可以按下面步骤手动允许。</p>
+
+        <div class="notice">
+            <strong>安全提示：</strong>只对你信任来源的 App 使用“仍要打开”。如果安装包不是从 AiStatus 官方页面下载，请不要继续。
+        </div>
+
+        <section class="grid" aria-labelledby="zh-title">
+            <div>
+                <h2 id="zh-title">设置 → 隐私与安全性 → 仍要打开</h2>
+                <ol class="steps">
+                    <li><strong>先关闭拦截提示</strong>看到“Apple 无法验证...”提示时，点击“完成”或关闭提示。</li>
+                    <li><strong>打开系统设置</strong>进入“系统设置” → “隐私与安全性”。旧版 macOS 可能是“系统偏好设置” → “安全性与隐私”。</li>
+                    <li><strong>点击仍要打开</strong>在“安全性”区域找到 AiStatus 被阻止的提示，点击“仍要打开”。</li>
+                    <li><strong>确认打开</strong>输入密码或使用 Touch ID，然后点击“打开”。之后 AiStatus 就可以正常启动。</li>
+                </ol>
+            </div>
+
+            <div class="visual" aria-label="系统设置图示">
+                <div class="settings-window">
+                    <div class="sidebar">
+                        <span></span>
+                        <span></span>
+                        <strong>隐私与安全性</strong>
+                        <span></span>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-title">安全性</div>
+                        <div class="gatekeeper">
+                            <p>“AiStatus” 已被阻止使用，因为 Apple 无法验证是否包含恶意软件。</p>
+                            <button type="button">仍要打开</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog">
+                    <span class="icon">!</span>
+                    <p>Apple 无法验证“AiStatus”是否包含可能危害 Mac 的恶意软件。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="english" aria-labelledby="en-title">
+            <h2 id="en-title">English: System Settings → Privacy & Security → Open Anyway</h2>
+            <ol class="steps">
+                <li><strong>Close the warning first</strong>When macOS says Apple cannot verify the app, click Done or close the dialog.</li>
+                <li><strong>Open System Settings</strong>Go to System Settings → Privacy & Security.</li>
+                <li><strong>Choose Open Anyway</strong>Scroll to Security, find the AiStatus blocked message, then click Open Anyway.</li>
+                <li><strong>Confirm opening</strong>Authenticate with your password or Touch ID, then click Open.</li>
+            </ol>
+        </section>
+    </main>
+</body>
+</html>

@@ -8,6 +8,7 @@ readonly ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 readonly APP_NAME="AiStatus"
 readonly DIST_DIR="$ROOT_DIR/dist"
 readonly INFO_PLIST="$ROOT_DIR/Resources/Info.plist"
+readonly INSTALL_GUIDE="$ROOT_DIR/Resources/InstallGuide.html"
 
 CONFIGURATION="release"
 TMP_DIR=""
@@ -104,6 +105,7 @@ main() {
 
     [[ "$(uname -s)" == "Darwin" ]] || error "DMG packaging requires macOS"
     [[ -f "$INFO_PLIST" ]] || error "missing Info.plist: $INFO_PLIST"
+    [[ -f "$INSTALL_GUIDE" ]] || error "missing install guide: $INSTALL_GUIDE"
     [[ -x "$SCRIPT_DIR/build-app.sh" ]] || error "build-app.sh is not executable"
     require_command hdiutil
     require_command ditto
@@ -134,6 +136,7 @@ main() {
 
     log "Preparing DMG contents"
     ditto "$app_path" "$TMP_DIR/$APP_NAME.app"
+    cp "$INSTALL_GUIDE" "$TMP_DIR/Install Guide.html"
     ln -s /Applications "$TMP_DIR/Applications"
 
     log "Creating compressed DMG"

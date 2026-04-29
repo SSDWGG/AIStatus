@@ -51,6 +51,8 @@ Scripts/build-dmg.sh
 - `dist/AiStatus-0.1.0.dmg`
 - `dist/AiStatus-0.1.0.dmg.sha256`
 
+DMG 内包含 `Install Guide.html`。如果用户首次打开时看到“Apple 无法验证是否包含可能危害 Mac 的恶意软件”，安装说明会引导用户进入“系统设置 → 隐私与安全性 → 仍要打开”。
+
 面向互联网公开下载时，建议使用 Developer ID 证书签名并公证：
 
 ```bash
@@ -70,6 +72,7 @@ Scripts/build-dmg.sh
 - 菜单栏状态灯、会话标题、防休眠、结束通知四个卖点
 - 本地解析和隐私说明
 - DMG 安装步骤
+- 非 Apple 认证证书导致 Gatekeeper 拦截时的“系统设置 → 隐私与安全性 → 仍要打开”图文说明
 - SHA-256 校验展示和复制按钮
 - 中英文双语切换，用户选择会保存在浏览器本地
 
