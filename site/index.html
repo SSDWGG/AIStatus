@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="cursor-follower" data-cursor aria-hidden="true">
+        <span class="cursor-halo"></span>
+        <span class="cursor-core"></span>
+    </div>
+
     <header class="site-header" aria-label="主导航" data-i18n-attr="aria-label:headerAria">
         <a class="brand" href="#top" aria-label="AiStatus 首页" data-i18n-attr="aria-label:brandAria">
             <img src="assets/app-icon.png" alt="" width="36" height="36">
@@ -59,7 +64,7 @@
                 </dl>
             </div>
 
-            <div class="product-visual" aria-label="AiStatus 产品预览" data-i18n-attr="aria-label:productAria">
+            <div class="product-visual" aria-label="AiStatus 产品预览" data-i18n-attr="aria-label:productAria" data-spring-card>
                 <div class="menubar">
                     <span class="window-dot red"></span>
                     <span class="window-dot amber"></span>
@@ -119,25 +124,57 @@
                 <h2 id="features-title" data-i18n="featuresTitle">只做一件事：直视本机 AI 任务状态</h2>
             </div>
             <div class="feature-grid">
-                <article class="feature-card">
-                    <span class="feature-index">01</span>
-                    <h3 data-i18n="featureOneTitle">菜单栏状态灯</h3>
-                    <p data-i18n="featureOneText">蓝灯代表 GPT 或 Claude 正在处理任务，绿灯代表两者都空闲。无需切回终端就能扫一眼确认。</p>
+                <article class="feature-card" data-expand-card data-spring-card>
+                    <button class="feature-card-toggle" type="button" aria-expanded="false" aria-controls="feature-one-detail">
+                        <span class="feature-index">01</span>
+                        <span class="expand-glyph" aria-hidden="true"></span>
+                        <h3 data-i18n="featureOneTitle">菜单栏状态灯</h3>
+                        <p data-i18n="featureOneText">蓝灯代表 GPT 或 Claude 正在处理任务，绿灯代表两者都空闲。无需切回终端就能扫一眼确认。</p>
+                    </button>
+                    <div class="card-expansion" id="feature-one-detail">
+                        <div>
+                            <p data-i18n="featureOneDetail">状态灯直接贴在菜单栏里，适合在多个窗口之间切换时保留一个持续可见的任务信号。</p>
+                        </div>
+                    </div>
                 </article>
-                <article class="feature-card">
-                    <span class="feature-index">02</span>
-                    <h3 data-i18n="featureTwoTitle">会话标题列表</h3>
-                    <p data-i18n="featureTwoText">读取 Codex 和 Claude Code 的本机会话事件，展示活跃和闲置会话标题，方便快速定位最近任务。</p>
+                <article class="feature-card" data-expand-card data-spring-card>
+                    <button class="feature-card-toggle" type="button" aria-expanded="false" aria-controls="feature-two-detail">
+                        <span class="feature-index">02</span>
+                        <span class="expand-glyph" aria-hidden="true"></span>
+                        <h3 data-i18n="featureTwoTitle">会话标题列表</h3>
+                        <p data-i18n="featureTwoText">读取 Codex 和 Claude Code 的本机会话事件，展示活跃和闲置会话标题，方便快速定位最近任务。</p>
+                    </button>
+                    <div class="card-expansion" id="feature-two-detail">
+                        <div>
+                            <p data-i18n="featureTwoDetail">列表把 GPT 与 Claude 的状态放在同一处，减少分别打开终端、日志和编辑器确认进度的来回切换。</p>
+                        </div>
+                    </div>
                 </article>
-                <article class="feature-card">
-                    <span class="feature-index">03</span>
-                    <h3 data-i18n="featureThreeTitle">防休眠开关</h3>
-                    <p data-i18n="featureThreeText">需要长时间等待模型输出时，可手动开启保持活跃，阻止系统和显示器因空闲进入睡眠。</p>
+                <article class="feature-card" data-expand-card data-spring-card>
+                    <button class="feature-card-toggle" type="button" aria-expanded="false" aria-controls="feature-three-detail">
+                        <span class="feature-index">03</span>
+                        <span class="expand-glyph" aria-hidden="true"></span>
+                        <h3 data-i18n="featureThreeTitle">防休眠开关</h3>
+                        <p data-i18n="featureThreeText">需要长时间等待模型输出时，可手动开启保持活跃，阻止系统和显示器因空闲进入睡眠。</p>
+                    </button>
+                    <div class="card-expansion" id="feature-three-detail">
+                        <div>
+                            <p data-i18n="featureThreeDetail">防休眠使用 macOS 电源断言，只有用户手动开启时才生效，适合长时间任务和外接显示器场景。</p>
+                        </div>
+                    </div>
                 </article>
-                <article class="feature-card">
-                    <span class="feature-index">04</span>
-                    <h3 data-i18n="featureFourTitle">结束通知</h3>
-                    <p data-i18n="featureFourText">当活跃会话变为空闲时，桌面通知会提示哪个会话刚结束，减少反复查看窗口的打断。</p>
+                <article class="feature-card" data-expand-card data-spring-card>
+                    <button class="feature-card-toggle" type="button" aria-expanded="false" aria-controls="feature-four-detail">
+                        <span class="feature-index">04</span>
+                        <span class="expand-glyph" aria-hidden="true"></span>
+                        <h3 data-i18n="featureFourTitle">结束通知</h3>
+                        <p data-i18n="featureFourText">当活跃会话变为空闲时，桌面通知会提示哪个会话刚结束，减少反复查看窗口的打断。</p>
+                    </button>
+                    <div class="card-expansion" id="feature-four-detail">
+                        <div>
+                            <p data-i18n="featureFourDetail">通知只在状态从运行切到空闲时出现，让你能继续做别的事，同时知道哪个 AI 任务刚刚结束。</p>
+                        </div>
+                    </div>
                 </article>
             </div>
         </section>
@@ -166,24 +203,24 @@
                 <h2 id="install-title" data-i18n="installTitle">下载 DMG，拖入 Applications。</h2>
             </div>
             <div class="install-grid">
-                <article class="install-step">
+                <article class="install-step" data-spring-card>
                     <span>1</span>
                     <h3 data-i18n="installStepOneTitle">下载</h3>
                     <p data-i18n="installStepOneText">获取当前版本的 DMG 安装包。</p>
                     <a href="downloads/AiStatus-0.1.0.dmg" download data-i18n="installStepOneLink">下载 AiStatus-0.1.0.dmg</a>
                 </article>
-                <article class="install-step">
+                <article class="install-step" data-spring-card>
                     <span>2</span>
                     <h3 data-i18n="installStepTwoTitle">安装</h3>
                     <p data-i18n="installStepTwoText">打开 DMG，把 AiStatus 拖到 Applications。</p>
                 </article>
-                <article class="install-step">
+                <article class="install-step" data-spring-card>
                     <span>3</span>
                     <h3 data-i18n="installStepThreeTitle">运行</h3>
                     <p data-i18n="installStepThreeText">从 Applications 启动，菜单栏出现状态灯后即可使用。</p>
                 </article>
             </div>
-            <div class="security-help" aria-labelledby="security-help-title">
+            <div class="security-help" aria-labelledby="security-help-title" data-spring-card>
                 <div class="security-copy">
                     <p class="eyebrow" data-i18n="securityEyebrow">Gatekeeper</p>
                     <h3 id="security-help-title" data-i18n="securityTitle">如果提示“Apple 无法验证”，这样打开。</h3>
