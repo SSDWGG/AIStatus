@@ -12,53 +12,54 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="site-header" aria-label="主导航">
-        <a class="brand" href="#top" aria-label="AiStatus 首页">
+    <header class="site-header" aria-label="主导航" data-i18n-attr="aria-label:headerAria">
+        <a class="brand" href="#top" aria-label="AiStatus 首页" data-i18n-attr="aria-label:brandAria">
             <img src="assets/app-icon.png" alt="" width="36" height="36">
             <span>AiStatus</span>
         </a>
-        <nav class="nav-links" aria-label="页面导航">
-            <a href="#features">功能</a>
-            <a href="#privacy">隐私</a>
-            <a href="#install">安装</a>
+        <nav class="nav-links" aria-label="页面导航" data-i18n-attr="aria-label:navAria">
+            <a href="#features" data-i18n="navFeatures">功能</a>
+            <a href="#privacy" data-i18n="navPrivacy">隐私</a>
+            <a href="#install" data-i18n="navInstall">安装</a>
         </nav>
-        <a class="header-download" href="downloads/AiStatus-0.1.0.dmg" download>下载 DMG</a>
+        <div class="header-actions">
+            <button class="language-toggle" type="button" data-lang-toggle aria-label="Switch to English" aria-pressed="false">
+                <span data-lang-current>EN</span>
+            </button>
+            <a class="header-download" href="downloads/AiStatus-0.1.0.dmg" download data-i18n="navDownload">下载 DMG</a>
+        </div>
     </header>
 
     <main id="top">
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-copy">
-                <p class="eyebrow">macOS menu bar utility</p>
-                <h1 id="hero-title">
-                    <span>让 AI 任务</span>
-                    <span>状态留在</span>
-                    <span>菜单栏。</span>
-                </h1>
-                <p class="hero-lede">
+                <p class="eyebrow" data-i18n="heroEyebrow">macOS menu bar utility</p>
+                <h1 id="hero-title" data-i18n="heroTitle">直视AI任务状态</h1>
+                <p class="hero-lede" data-i18n="heroLede">
                     AiStatus 用一颗状态灯显示本机 Codex/GPT 与 Claude Code 是否正在工作，
                     并提供一个可手动开启的防休眠开关。
                 </p>
-                <div class="hero-actions" aria-label="下载操作">
-                    <a class="download-button" href="downloads/AiStatus-0.1.0.dmg" download>下载 macOS 版</a>
-                    <a class="checksum-link" href="downloads/AiStatus-0.1.0.dmg.sha256">查看 SHA-256</a>
+                <div class="hero-actions" aria-label="下载操作" data-i18n-attr="aria-label:downloadActionsAria">
+                    <a class="download-button" href="downloads/AiStatus-0.1.0.dmg" download data-i18n="heroDownload">下载 macOS 版</a>
+                    <a class="checksum-link" href="downloads/AiStatus-0.1.0.dmg.sha256" data-i18n="heroChecksum">查看 SHA-256</a>
                 </div>
-                <dl class="release-strip" aria-label="版本信息">
+                <dl class="release-strip" aria-label="版本信息" data-i18n-attr="aria-label:releaseAria">
                     <div>
-                        <dt>版本</dt>
+                        <dt data-i18n="releaseVersion">版本</dt>
                         <dd>0.1.0</dd>
                     </div>
                     <div>
-                        <dt>格式</dt>
+                        <dt data-i18n="releaseFormat">格式</dt>
                         <dd>DMG</dd>
                     </div>
                     <div>
-                        <dt>大小</dt>
-                        <dd>约 1.2 MB</dd>
+                        <dt data-i18n="releaseSize">大小</dt>
+                        <dd data-i18n="releaseSizeValue">约 1.2 MB</dd>
                     </div>
                 </dl>
             </div>
 
-            <div class="product-visual" aria-label="AiStatus 产品预览">
+            <div class="product-visual" aria-label="AiStatus 产品预览" data-i18n-attr="aria-label:productAria">
                 <div class="menubar">
                     <span class="window-dot red"></span>
                     <span class="window-dot amber"></span>
@@ -68,10 +69,10 @@
                 </div>
                 <div class="status-panel">
                     <div class="panel-head">
-                        <img src="assets/app-icon.png" alt="AiStatus 图标" width="72" height="72">
+                        <img src="assets/app-icon.png" alt="AiStatus 图标" width="72" height="72" data-i18n-attr="alt:iconAlt">
                         <div>
-                            <p class="panel-kicker">当前状态</p>
-                            <p class="panel-state">蓝灯，GPT + Claude 正在使用</p>
+                            <p class="panel-kicker" data-i18n="panelKicker">当前状态</p>
+                            <p class="panel-state" data-i18n="panelState">蓝灯，GPT + Claude 正在使用</p>
                         </div>
                     </div>
                     <div class="provider-grid">
@@ -79,33 +80,33 @@
                             <span class="provider-dot"></span>
                             <div>
                                 <strong>GPT</strong>
-                                <span>活跃会话 1</span>
+                                <span data-i18n="activeSessionOne">活跃会话 1</span>
                             </div>
                         </div>
                         <div class="provider running">
                             <span class="provider-dot"></span>
                             <div>
                                 <strong>Claude</strong>
-                                <span>活跃会话 1</span>
+                                <span data-i18n="activeSessionOne">活跃会话 1</span>
                             </div>
                         </div>
                         <div class="provider idle">
                             <span class="provider-dot"></span>
                             <div>
-                                <strong>防休眠</strong>
-                                <span>已开启</span>
+                                <strong data-i18n="sleepPrevention">防休眠</strong>
+                                <span data-i18n="enabled">已开启</span>
                             </div>
                         </div>
                     </div>
                     <div class="session-list">
-                        <p>最近事件</p>
+                        <p data-i18n="latestEvent">最近事件</p>
                         <div class="session-row">
-                            <span>整理项目状态和会话标题</span>
-                            <span>运行中</span>
+                            <span data-i18n="sampleRunningTitle">整理项目状态和会话标题</span>
+                            <span data-i18n="running">运行中</span>
                         </div>
                         <div class="session-row muted">
-                            <span>修复防休眠显示器断言</span>
-                            <span>已结束</span>
+                            <span data-i18n="sampleEndedTitle">修复防休眠显示器断言</span>
+                            <span data-i18n="ended">已结束</span>
                         </div>
                     </div>
                 </div>
@@ -114,83 +115,83 @@
 
         <section class="section band" id="features" aria-labelledby="features-title">
             <div class="section-heading">
-                <p class="eyebrow">What it watches</p>
-                <h2 id="features-title">只做一件事：看见本机 AI 是否还在跑。</h2>
+                <p class="eyebrow" data-i18n="featuresEyebrow">What it watches</p>
+                <h2 id="features-title" data-i18n="featuresTitle">只做一件事：直视本机 AI 任务状态</h2>
             </div>
             <div class="feature-grid">
                 <article class="feature-card">
                     <span class="feature-index">01</span>
-                    <h3>菜单栏状态灯</h3>
-                    <p>蓝灯代表 GPT 或 Claude 正在处理任务，绿灯代表两者都空闲。无需切回终端就能扫一眼确认。</p>
+                    <h3 data-i18n="featureOneTitle">菜单栏状态灯</h3>
+                    <p data-i18n="featureOneText">蓝灯代表 GPT 或 Claude 正在处理任务，绿灯代表两者都空闲。无需切回终端就能扫一眼确认。</p>
                 </article>
                 <article class="feature-card">
                     <span class="feature-index">02</span>
-                    <h3>会话标题列表</h3>
-                    <p>读取 Codex 和 Claude Code 的本机会话事件，展示活跃和闲置会话标题，方便快速定位最近任务。</p>
+                    <h3 data-i18n="featureTwoTitle">会话标题列表</h3>
+                    <p data-i18n="featureTwoText">读取 Codex 和 Claude Code 的本机会话事件，展示活跃和闲置会话标题，方便快速定位最近任务。</p>
                 </article>
                 <article class="feature-card">
                     <span class="feature-index">03</span>
-                    <h3>防休眠开关</h3>
-                    <p>需要长时间等待模型输出时，可手动开启保持活跃，阻止系统和显示器因空闲进入睡眠。</p>
+                    <h3 data-i18n="featureThreeTitle">防休眠开关</h3>
+                    <p data-i18n="featureThreeText">需要长时间等待模型输出时，可手动开启保持活跃，阻止系统和显示器因空闲进入睡眠。</p>
                 </article>
                 <article class="feature-card">
                     <span class="feature-index">04</span>
-                    <h3>结束通知</h3>
-                    <p>当活跃会话变为空闲时，桌面通知会提示哪个会话刚结束，减少反复查看窗口的打断。</p>
+                    <h3 data-i18n="featureFourTitle">结束通知</h3>
+                    <p data-i18n="featureFourText">当活跃会话变为空闲时，桌面通知会提示哪个会话刚结束，减少反复查看窗口的打断。</p>
                 </article>
             </div>
         </section>
 
         <section class="section privacy" id="privacy" aria-labelledby="privacy-title">
             <div>
-                <p class="eyebrow">Local first</p>
-                <h2 id="privacy-title">本地解析，不上传会话正文。</h2>
+                <p class="eyebrow" data-i18n="privacyEyebrow">Local first</p>
+                <h2 id="privacy-title" data-i18n="privacyTitle">本地解析，不上传会话正文。</h2>
             </div>
             <div class="privacy-copy">
-                <p>
+                <p data-i18n="privacyText">
                     AiStatus 只读取运行状态和用于展示的会话标题。它不复制完整会话正文，也不需要远程账号。
                     当前版本面向本机使用场景，所有状态判断都在你的 Mac 上完成。
                 </p>
                 <ul class="privacy-list">
-                    <li><span></span>读取 <code>~/.codex/sessions</code> 的任务事件</li>
-                    <li><span></span>读取 <code>~/.claude/projects</code> 的 Claude Code 事件</li>
-                    <li><span></span>防休眠功能必须由用户手动开启</li>
+                    <li><span></span><span data-i18n-html="privacyItemCodex">读取 <code>~/.codex/sessions</code> 的任务事件</span></li>
+                    <li><span></span><span data-i18n-html="privacyItemClaude">读取 <code>~/.claude/projects</code> 的 Claude Code 事件</span></li>
+                    <li><span></span><span data-i18n="privacyItemSleep">防休眠功能必须由用户手动开启</span></li>
                 </ul>
             </div>
         </section>
 
         <section class="section install" id="install" aria-labelledby="install-title">
             <div class="section-heading">
-                <p class="eyebrow">Install</p>
-                <h2 id="install-title">下载 DMG，拖入 Applications。</h2>
+                <p class="eyebrow" data-i18n="installEyebrow">Install</p>
+                <h2 id="install-title" data-i18n="installTitle">下载 DMG，拖入 Applications。</h2>
             </div>
             <div class="install-grid">
                 <article class="install-step">
                     <span>1</span>
-                    <h3>下载</h3>
-                    <p>获取当前版本的 DMG 安装包。</p>
-                    <a href="downloads/AiStatus-0.1.0.dmg" download>下载 AiStatus-0.1.0.dmg</a>
+                    <h3 data-i18n="installStepOneTitle">下载</h3>
+                    <p data-i18n="installStepOneText">获取当前版本的 DMG 安装包。</p>
+                    <a href="downloads/AiStatus-0.1.0.dmg" download data-i18n="installStepOneLink">下载 AiStatus-0.1.0.dmg</a>
                 </article>
                 <article class="install-step">
                     <span>2</span>
-                    <h3>安装</h3>
-                    <p>打开 DMG，把 AiStatus 拖到 Applications。</p>
+                    <h3 data-i18n="installStepTwoTitle">安装</h3>
+                    <p data-i18n="installStepTwoText">打开 DMG，把 AiStatus 拖到 Applications。</p>
                 </article>
                 <article class="install-step">
                     <span>3</span>
-                    <h3>运行</h3>
-                    <p>从 Applications 启动，菜单栏出现状态灯后即可使用。</p>
+                    <h3 data-i18n="installStepThreeTitle">运行</h3>
+                    <p data-i18n="installStepThreeText">从 Applications 启动，菜单栏出现状态灯后即可使用。</p>
                 </article>
             </div>
             <div class="download-panel">
                 <div>
-                    <p class="panel-label">Current release</p>
+                    <p class="panel-label" data-i18n="currentRelease">Current release</p>
                     <h3>AiStatus 0.1.0 for macOS</h3>
-                    <p>DMG SHA-256 校验文件随包提供，适合放到下载页一起发布。</p>
+                    <p data-i18n="downloadPanelText">DMG SHA-256 校验文件随包提供，适合放到下载页一起发布。</p>
                 </div>
                 <div class="download-panel-actions">
-                    <a class="download-button compact" href="downloads/AiStatus-0.1.0.dmg" download>下载 DMG</a>
-                    <button class="copy-button" type="button" data-copy-source="checksum">复制 SHA-256</button>
+                    <a class="download-button compact" href="downloads/AiStatus-0.1.0.dmg" download data-i18n="downloadDmg">下载 DMG</a>
+                    <button class="copy-button" type="button" data-copy-source="checksum" data-i18n="copySha">复制 SHA-256</button>
                 </div>
             </div>
             <pre class="checksum" id="checksum" tabindex="0">f37cc16d0dda62e227c7305718ab5c9873635e96a1438eb1ebef894090a910d4  AiStatus-0.1.0.dmg</pre>
@@ -199,7 +200,7 @@
 
     <footer class="site-footer">
         <span>AiStatus</span>
-        <a href="downloads/AiStatus-0.1.0.dmg" download>下载</a>
+        <a href="downloads/AiStatus-0.1.0.dmg" download data-i18n="footerDownload">下载</a>
     </footer>
 
     <script src="script.js"></script>
