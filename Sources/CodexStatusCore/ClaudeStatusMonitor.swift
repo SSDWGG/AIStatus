@@ -12,6 +12,8 @@ public struct ClaudeStatusSnapshot: Equatable {
     public let latestEventType: String?
     public let latestSessionFile: URL?
     public let latestSessionTitle: String?
+    public let activeSessions: [StatusSessionSummary]
+    public let idleSessions: [StatusSessionSummary]
     public let activeSessionTitles: [String]
     public let idleSessionTitles: [String]
     public let scannedFileCount: Int
@@ -56,6 +58,8 @@ public final class ClaudeStatusMonitor {
                 latestEventType: nil,
                 latestSessionFile: nil,
                 latestSessionTitle: nil,
+                activeSessions: [],
+                idleSessions: [],
                 activeSessionTitles: [],
                 idleSessionTitles: [],
                 scannedFileCount: 0,
@@ -88,6 +92,8 @@ public final class ClaudeStatusMonitor {
             }
 
             let representative = newestActivity(in: activeActivities) ?? latestActivity
+            let activeSessions = sessionSummaries(from: activeActivities)
+            let idleSessions = sessionSummaries(from: idleActivities)
 
             return ClaudeStatusSnapshot(
                 state: activeActivities.isEmpty ? .idle : .thinking,
@@ -96,8 +102,10 @@ public final class ClaudeStatusMonitor {
                 latestEventType: representative?.latestEventType,
                 latestSessionFile: representative?.fileURL,
                 latestSessionTitle: representative.map(sessionTitle),
-                activeSessionTitles: sessionTitles(from: activeActivities),
-                idleSessionTitles: sessionTitles(from: idleActivities),
+                activeSessions: activeSessions,
+                idleSessions: idleSessions,
+                activeSessionTitles: activeSessions.map(\.title),
+                idleSessionTitles: idleSessions.map(\.title),
                 scannedFileCount: files.count,
                 staleAfter: staleAfter,
                 claudeHome: claudeHome,
@@ -111,6 +119,8 @@ public final class ClaudeStatusMonitor {
                 latestEventType: nil,
                 latestSessionFile: nil,
                 latestSessionTitle: nil,
+                activeSessions: [],
+                idleSessions: [],
                 activeSessionTitles: [],
                 idleSessionTitles: [],
                 scannedFileCount: 0,
@@ -161,12 +171,17 @@ public final class ClaudeStatusMonitor {
         }
     }
 
-    private func sessionTitles(from activities: [ClaudeSessionActivity]) -> [String] {
+    private func sessionSummaries(from activities: [ClaudeSessionActivity]) -> [StatusSessionSummary] {
         activities
             .sorted {
                 ($0.latestEventAt ?? $0.modifiedAt) > ($1.latestEventAt ?? $1.modifiedAt)
             }
-            .map(sessionTitle)
+            .map { activity in
+                StatusSessionSummary(
+                    id: activity.fileURL.path,
+                    title: sessionTitle(for: activity)
+                )
+            }
     }
 
     private func sessionTitle(for activity: ClaudeSessionActivity) -> String {

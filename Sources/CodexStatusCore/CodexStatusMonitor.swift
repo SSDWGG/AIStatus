@@ -12,6 +12,8 @@ public struct CodexStatusSnapshot: Equatable {
     public let latestEventType: String?
     public let latestSessionFile: URL?
     public let latestSessionTitle: String?
+    public let activeSessions: [StatusSessionSummary]
+    public let idleSessions: [StatusSessionSummary]
     public let activeSessionTitles: [String]
     public let idleSessionTitles: [String]
     public let scannedFileCount: Int
@@ -58,6 +60,8 @@ public final class CodexStatusMonitor {
                 latestEventType: nil,
                 latestSessionFile: nil,
                 latestSessionTitle: nil,
+                activeSessions: [],
+                idleSessions: [],
                 activeSessionTitles: [],
                 idleSessionTitles: [],
                 scannedFileCount: 0,
@@ -94,6 +98,8 @@ public final class CodexStatusMonitor {
             }
 
             let representative = newestActivity(in: activeActivities) ?? latestActivity
+            let activeSessions = sessionSummaries(from: activeActivities)
+            let idleSessions = sessionSummaries(from: idleActivities)
 
             return CodexStatusSnapshot(
                 state: activeActivities.isEmpty ? .idle : .thinking,
@@ -102,8 +108,10 @@ public final class CodexStatusMonitor {
                 latestEventType: representative?.latestEventType,
                 latestSessionFile: representative?.fileURL,
                 latestSessionTitle: representative.map(sessionTitle),
-                activeSessionTitles: sessionTitles(from: activeActivities),
-                idleSessionTitles: sessionTitles(from: idleActivities),
+                activeSessions: activeSessions,
+                idleSessions: idleSessions,
+                activeSessionTitles: activeSessions.map(\.title),
+                idleSessionTitles: idleSessions.map(\.title),
                 scannedFileCount: files.count,
                 staleAfter: staleAfter,
                 codexHome: codexHome,
@@ -117,6 +125,8 @@ public final class CodexStatusMonitor {
                 latestEventType: nil,
                 latestSessionFile: nil,
                 latestSessionTitle: nil,
+                activeSessions: [],
+                idleSessions: [],
                 activeSessionTitles: [],
                 idleSessionTitles: [],
                 scannedFileCount: 0,
@@ -167,16 +177,25 @@ public final class CodexStatusMonitor {
         }
     }
 
-    private func sessionTitles(from activities: [SessionActivity]) -> [String] {
+    private func sessionSummaries(from activities: [SessionActivity]) -> [StatusSessionSummary] {
         activities
             .sorted {
                 ($0.latestEventAt ?? $0.modifiedAt) > ($1.latestEventAt ?? $1.modifiedAt)
             }
-            .map(sessionTitle)
+            .map { activity in
+                StatusSessionSummary(
+                    id: sessionIdentifier(for: activity),
+                    title: sessionTitle(for: activity)
+                )
+            }
     }
 
     private func sessionTitle(for activity: SessionActivity) -> String {
         SessionTitleNormalizer.displayTitle(activity.title)
+    }
+
+    private func sessionIdentifier(for activity: SessionActivity) -> String {
+        sessionID(from: activity.fileURL) ?? activity.fileURL.path
     }
 
     private func sessionID(from url: URL) -> String? {

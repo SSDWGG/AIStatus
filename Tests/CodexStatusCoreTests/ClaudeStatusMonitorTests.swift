@@ -22,6 +22,7 @@ final class ClaudeStatusMonitorTests: XCTestCase {
         XCTAssertEqual(snapshot.activeSessionCount, 1)
         XCTAssertEqual(snapshot.latestEventType, "assistant:tool_use")
         XCTAssertEqual(snapshot.latestSessionTitle, "活跃 Claude 会话")
+        XCTAssertEqual(snapshot.activeSessions.map(\.title), ["活跃 Claude 会话"])
         XCTAssertEqual(snapshot.activeSessionTitles, ["活跃 Claude 会话"])
     }
 
@@ -43,6 +44,7 @@ final class ClaudeStatusMonitorTests: XCTestCase {
         XCTAssertEqual(snapshot.activeSessionCount, 0)
         XCTAssertEqual(snapshot.latestEventType, "assistant:end_turn")
         XCTAssertEqual(snapshot.latestSessionTitle, "闲置 Claude 会话")
+        XCTAssertEqual(snapshot.idleSessions.map(\.title), ["闲置 Claude 会话"])
         XCTAssertEqual(snapshot.idleSessionTitles, ["闲置 Claude 会话"])
     }
 

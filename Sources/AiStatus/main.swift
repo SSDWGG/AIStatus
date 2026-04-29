@@ -2,14 +2,16 @@ import AppKit
 import CodexStatusCore
 import Foundation
 import IOKit.pwr_mgt
+import UserNotifications
 
 @main
-final class AiStatusApp: NSObject, NSApplicationDelegate {
+final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     private let gptMonitor = CodexStatusMonitor()
     private let claudeMonitor = ClaudeStatusMonitor()
     private let colorPreferences = StatusLightColorPreferences()
     private let sleepPreventionPreferences = SleepPreventionPreferences()
     private let sleepPreventer = SleepPreventer()
+    private let notificationCenter = UNUserNotificationCenter.current()
     private let statusItem = NSStatusBar.system.statusItem(withLength: 24)
     private let menu = NSMenu()
     private let stateMenuItem = NSMenuItem(title: "状态：检测中", action: nil, keyEquivalent: "")
@@ -32,6 +34,8 @@ final class AiStatusApp: NSObject, NSApplicationDelegate {
 
     private var timer: Timer?
     private var powerAssertionErrorMessage: String?
+    private var notificationErrorMessage: String?
+    private var previousActiveSessionsByID: [String: TrackedSession]?
 
     static func main() {
         let app = NSApplication.shared
@@ -44,6 +48,7 @@ final class AiStatusApp: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         configureStatusItem()
         configureMenu()
+        configureNotifications()
         applySleepPreventionPreference()
         refresh()
 
@@ -213,14 +218,108 @@ final class AiStatusApp: NSObject, NSApplicationDelegate {
         )
         populateSessionMenu(claudeActiveSessionsMenu, titles: claudeSnapshot.activeSessionTitles)
         populateSessionMenu(claudeIdleSessionsMenu, titles: claudeSnapshot.idleSessionTitles)
+        updateSessionTransitionNotifications(gptSnapshot: gptSnapshot, claudeSnapshot: claudeSnapshot)
 
-        let errors = [gptSnapshot.errorMessage, claudeSnapshot.errorMessage, powerAssertionErrorMessage].compactMap { $0 }
+        let errors = [
+            gptSnapshot.errorMessage,
+            claudeSnapshot.errorMessage,
+            powerAssertionErrorMessage,
+            notificationErrorMessage
+        ].compactMap { $0 }
         if !errors.isEmpty {
             errorMenuItem.title = "提示：\(errors.joined(separator: "；"))"
             errorMenuItem.isHidden = false
         } else {
             errorMenuItem.isHidden = true
         }
+    }
+
+    private func configureNotifications() {
+        notificationCenter.delegate = self
+        notificationCenter.requestAuthorization(options: [.alert, .sound]) { [weak self] granted, error in
+            DispatchQueue.main.async {
+                if let error {
+                    self?.notificationErrorMessage = "通知权限请求失败：\(error.localizedDescription)"
+                } else if !granted {
+                    self?.notificationErrorMessage = "没有通知权限，无法提示会话结束"
+                } else {
+                    self?.notificationErrorMessage = nil
+                }
+                self?.refresh()
+            }
+        }
+    }
+
+    private func updateSessionTransitionNotifications(
+        gptSnapshot: CodexStatusSnapshot,
+        claudeSnapshot: ClaudeStatusSnapshot
+    ) {
+        guard gptSnapshot.errorMessage == nil, claudeSnapshot.errorMessage == nil else {
+            return
+        }
+
+        let currentActiveSessions = trackedSessions(
+            provider: "GPT",
+            sessions: gptSnapshot.activeSessions
+        ).merging(
+            trackedSessions(provider: "Claude", sessions: claudeSnapshot.activeSessions),
+            uniquingKeysWith: { current, _ in current }
+        )
+
+        guard let previousActiveSessionsByID else {
+            self.previousActiveSessionsByID = currentActiveSessions
+            return
+        }
+
+        for (id, session) in previousActiveSessionsByID where currentActiveSessions[id] == nil {
+            sendSessionEndedNotification(for: session)
+        }
+
+        self.previousActiveSessionsByID = currentActiveSessions
+    }
+
+    private func trackedSessions(
+        provider: String,
+        sessions: [StatusSessionSummary]
+    ) -> [String: TrackedSession] {
+        Dictionary(
+            uniqueKeysWithValues: sessions.map { session in
+                let id = "\(provider):\(session.id)"
+                return (id, TrackedSession(id: id, provider: provider, title: session.title))
+            }
+        )
+    }
+
+    private func sendSessionEndedNotification(for session: TrackedSession) {
+        let content = UNMutableNotificationContent()
+        content.title = "\(session.provider) 会话已结束"
+        content.body = session.title
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "session-ended-\(UUID().uuidString)",
+            content: content,
+            trigger: nil
+        )
+
+        notificationCenter.add(request) { [weak self] error in
+            guard let error else {
+                return
+            }
+
+            DispatchQueue.main.async {
+                self?.notificationErrorMessage = "发送通知失败：\(error.localizedDescription)"
+                self?.refresh()
+            }
+        }
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound])
     }
 
     private func applySleepPreventionPreference() {
@@ -278,6 +377,12 @@ final class AiStatusApp: NSObject, NSApplicationDelegate {
             menu.addItem(item)
         }
     }
+}
+
+private struct TrackedSession: Equatable {
+    let id: String
+    let provider: String
+    let title: String
 }
 
 private final class StatusLightColorPreferences {

@@ -1,5 +1,15 @@
 import Foundation
 
+public struct StatusSessionSummary: Equatable, Hashable {
+    public let id: String
+    public let title: String
+
+    public init(id: String, title: String) {
+        self.id = id
+        self.title = title
+    }
+}
+
 enum SessionTitleNormalizer {
     static func title(from text: String?, maxLength: Int = 80) -> String? {
         guard let text else {

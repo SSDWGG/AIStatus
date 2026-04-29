@@ -92,6 +92,12 @@ final class CodexStatusMonitorTests: XCTestCase {
         let snapshot = CodexStatusMonitor(codexHome: root, staleAfter: 30 * 60).snapshot(at: now)
 
         XCTAssertEqual(snapshot.latestSessionTitle, "活跃会话标题")
+        XCTAssertEqual(snapshot.activeSessions, [
+            StatusSessionSummary(id: activeID, title: "活跃会话标题")
+        ])
+        XCTAssertEqual(snapshot.idleSessions, [
+            StatusSessionSummary(id: idleID, title: "闲置会话标题")
+        ])
         XCTAssertEqual(snapshot.activeSessionTitles, ["活跃会话标题"])
         XCTAssertEqual(snapshot.idleSessionTitles, ["闲置会话标题"])
     }
