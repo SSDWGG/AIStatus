@@ -11,6 +11,7 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private let colorPreferences = StatusLightColorPreferences()
     private let sleepPreventionPreferences = SleepPreventionPreferences()
     private let sleepPreventer = SleepPreventer()
+    private let allWorkEmailNotifier = AllWorkEmailNotifier()
     private let notificationCenter = UNUserNotificationCenter.current()
     private let statusItem = NSStatusBar.system.statusItem(withLength: 24)
     private let menu = NSMenu()
@@ -35,6 +36,8 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private var timer: Timer?
     private var powerAssertionErrorMessage: String?
     private var notificationErrorMessage: String?
+    private var emailErrorMessage: String?
+    private var activeWorkTransitionTracker = ActiveWorkTransitionTracker()
     private var previousActiveSessionsByID: [String: TrackedSession]?
 
     static func main() {
@@ -224,7 +227,8 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
             gptSnapshot.errorMessage,
             claudeSnapshot.errorMessage,
             powerAssertionErrorMessage,
-            notificationErrorMessage
+            notificationErrorMessage,
+            emailErrorMessage
         ].compactMap { $0 }
         if !errors.isEmpty {
             errorMenuItem.title = "提示：\(errors.joined(separator: "；"))"
@@ -265,6 +269,7 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
             trackedSessions(provider: "Claude", sessions: claudeSnapshot.activeSessions),
             uniquingKeysWith: { current, _ in current }
         )
+        let didFinishAllWork = activeWorkTransitionTracker.update(activeSessionCount: currentActiveSessions.count)
 
         guard let previousActiveSessionsByID else {
             self.previousActiveSessionsByID = currentActiveSessions
@@ -273,6 +278,9 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         for (id, session) in previousActiveSessionsByID where currentActiveSessions[id] == nil {
             sendSessionEndedNotification(for: session)
+        }
+        if didFinishAllWork {
+            sendAllWorkFinishedEmail(endedSessions: Array(previousActiveSessionsByID.values))
         }
 
         self.previousActiveSessionsByID = currentActiveSessions
@@ -311,6 +319,13 @@ final class AiStatusApp: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 self?.notificationErrorMessage = "发送通知失败：\(error.localizedDescription)"
                 self?.refresh()
             }
+        }
+    }
+
+    private func sendAllWorkFinishedEmail(endedSessions: [TrackedSession]) {
+        allWorkEmailNotifier.send(endedSessions: endedSessions) { [weak self] errorMessage in
+            self?.emailErrorMessage = errorMessage
+            self?.refresh()
         }
     }
 
@@ -383,6 +398,64 @@ private struct TrackedSession: Equatable {
     let id: String
     let provider: String
     let title: String
+}
+
+private final class AllWorkEmailNotifier {
+    private let queue = DispatchQueue(label: "AiStatus.emailNotifier")
+
+    func send(
+        endedSessions: [TrackedSession],
+        completion: @escaping (String?) -> Void
+    ) {
+        let finishedAt = Date()
+        queue.async {
+            do {
+                guard let config = try EmailNotificationConfigLoader.load() else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                    return
+                }
+
+                let message = EmailMessage(
+                    from: config.from,
+                    to: config.to,
+                    subject: config.subject,
+                    body: Self.messageBody(endedSessions: endedSessions, finishedAt: finishedAt),
+                    date: finishedAt
+                )
+                try SMTPEmailSender(config: config).send(message: message)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion("发送邮件失败：\(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private static func messageBody(endedSessions: [TrackedSession], finishedAt: Date) -> String {
+        let sessionLines = endedSessions
+            .sorted { lhs, rhs in
+                lhs.provider == rhs.provider ? lhs.title < rhs.title : lhs.provider < rhs.provider
+            }
+            .map { "- [\($0.provider)] \($0.title)" }
+
+        let sessionSummary = sessionLines.isEmpty
+            ? "无会话详情"
+            : sessionLines.joined(separator: "\n")
+
+        return """
+        AiStatus 检测到 GPT / Claude 均已空闲，所有 AI 工作已经结束。
+
+        结束时间：\(DateFormatter.localizedString(from: finishedAt, dateStyle: .medium, timeStyle: .medium))
+
+        最后结束的会话：
+        \(sessionSummary)
+        """
+    }
 }
 
 private final class StatusLightColorPreferences {

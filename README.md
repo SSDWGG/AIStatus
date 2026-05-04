@@ -7,6 +7,7 @@ AiStatus 是一款 macOS 菜单栏状态灯，用来观察本机 Codex/GPT 和 C
 - **菜单栏状态灯**：默认蓝灯表示检测到 GPT 或 Claude 正在使用，默认绿灯表示两者都空闲。
 - **会话标题列表**：菜单中展示 GPT/Claude 的活跃会话和闲置会话标题。
 - **结束通知**：当 GPT/Claude 会话从活跃变为闲置时，桌面通知提示结束的是哪个会话。
+- **全部结束邮件**：当最后一个活跃的 GPT/Claude 会话结束、两者都空闲时，可发送一封邮件通知。
 - **颜色偏好**：可以分别配置运行时灯颜色和空闲时灯颜色。
 - **保持 Mac 活跃**：菜单里可以开启“保持 Mac 活跃（防休眠）”，阻止系统和显示器因空闲进入睡眠。
 - **本地优先**：只解析运行状态和用于展示的会话标题，不复制完整会话正文。
@@ -26,6 +27,51 @@ swift run AiStatus
 ```
 
 项目要求 macOS 13+，Swift Package 配置见 `Package.swift`。
+
+## 邮件通知配置
+
+邮件功能默认关闭；创建 `~/.aistatus/email.json` 后启用。AiStatus 会在“上一次刷新仍有活跃会话，本次刷新 GPT/Claude 活跃会话数变成 0”时发送一封邮件，不会在每个单独会话结束时重复发送。
+
+```bash
+mkdir -p ~/.aistatus
+chmod 700 ~/.aistatus
+```
+
+推荐把 SMTP 授权码存到 macOS Keychain，再通过 `passwordCommand` 读取：
+
+```bash
+security add-generic-password \
+  -U \
+  -s aistatus-email \
+  -a sender@example.com \
+  -w 'your-smtp-app-password'
+```
+
+`~/.aistatus/email.json` 示例：
+
+```json
+{
+  "smtpURL": "smtps://smtp.example.com:465",
+  "username": "sender@example.com",
+  "passwordCommand": "security find-generic-password -s aistatus-email -a sender@example.com -w",
+  "from": "sender@example.com",
+  "to": ["you@example.com"],
+  "subject": "AiStatus：所有 AI 工作已结束",
+  "requiresTLS": true
+}
+```
+
+字段说明：
+
+- `smtpURL`：SMTP 地址，支持 `smtps://host:465` 或 `smtp://host:587`。
+- `username`：SMTP 登录用户名；如服务端不需要认证可省略。
+- `password` / `passwordCommand`：二选一。建议使用 `passwordCommand`，避免明文授权码落盘。
+- `from`：发件邮箱地址。
+- `to`：收件邮箱地址数组，也可以写成单个字符串。
+- `subject`：邮件标题；不填时使用默认英文标题。
+- `requiresTLS`：默认 `true`，适合大多数 SMTP 服务。
+
+也可以用环境变量覆盖配置路径或密码：`AISTATUS_EMAIL_CONFIG`、`AISTATUS_EMAIL_PASSWORD`、`AISTATUS_EMAIL_PASSWORD_COMMAND`。如果通过 Finder 打开打包后的 App，shell 里的环境变量通常不会自动传入，优先使用 `~/.aistatus/email.json`。
 
 ## 打包成菜单栏 App
 
